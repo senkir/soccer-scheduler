@@ -1,0 +1,9 @@
+chg	H/A	Date	Time	Opponent	Location
+	H	Sep 6, 2025, Sat	10:30 a.m.	WSC-G6B-Okamoto	Powerlines Park 4
+	A	Sep 13, 2025, Sat	9:00 a.m.	WSC-G6B-Folge	Powerlines Park 4
+	A	Sep 20, 2025, Sat	10:30 a.m.	TSC-G6B-James	Atfalati Park
+	H	Sep 27, 2025, Sat	9:00 a.m.	SWSC-G6B-Devine	Water District Park 2
+	A	Oct 4, 2025, Sat	10:30 a.m.	TSC-G6B-Johnson	Atfalati Park
+	H	Oct 11, 2025, Sat	12:00 p.m.	SYSC-G6B-Phillips	Powerlines Park 4
+	H	Oct 18, 2025, Sat	9:00 a.m.	WSC-G6B-Cary	Water District Park 2
+	A	Oct 25, 2025, Sat	10:30 a.m.	AJRSC-G6B-Kevan	Cook Park 5A
