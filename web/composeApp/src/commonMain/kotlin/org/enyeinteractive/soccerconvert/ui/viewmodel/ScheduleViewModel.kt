@@ -20,12 +20,21 @@ import org.enyeinteractive.soccerconvert.ui.data.Opponent
 import org.enyeinteractive.soccerconvert.ui.data.ScheduleMetadata
 import org.enyeinteractive.soccerconvert.ui.data.ScheduledEvent
 
+sealed interface ScheduleError {
+    data object UrlPaste : ScheduleError
+    data object ParseFailed : ScheduleError
+    data object EmptyEvents : ScheduleError
+    data object EmptyCsv : ScheduleError
+    data object CalendarExportFailed : ScheduleError
+    data class Conversion(val details: List<String>) : ScheduleError
+}
+
 data class ScheduleUiState(
     val scheduleMetadata: ScheduleMetadata? = null,
     val events: List<ScheduledEvent> = emptyList(),
     val locations: List<Location> = emptyList(),
     val calendarCsv: String = "",
-    val errorMessage: String? = null
+    val error: ScheduleError? = null
 )
 
 class ScheduleViewModel(
@@ -46,14 +55,14 @@ class ScheduleViewModel(
     fun onSubmit(htmlInput: String) {
         val trimmedInput: String = htmlInput.trim()
         if (isRemoteUrl(trimmedInput)) {
-            _uiState.value = ScheduleUiState(errorMessage = URL_PASTE_ERROR)
+            _uiState.value = ScheduleUiState(error = ScheduleError.UrlPaste)
             return
         }
         try {
             val content: WebContent = scanner.parse(trimmedInput)
             _uiState.value = createSuccessState(content)
         } catch (_: Exception) {
-            _uiState.value = ScheduleUiState(errorMessage = PARSE_ERROR)
+            _uiState.value = ScheduleUiState(error = ScheduleError.ParseFailed)
         }
         generateCalendar()
     }
@@ -80,7 +89,7 @@ class ScheduleViewModel(
             team = content.teamName,
             coach = content.coach,
             club = seasonParts.lastOrNull() ?: "",
-            group = parseGroupComponents(groupCode),
+            group = groupCode,
             season = seasonParts.firstOrNull() ?: ""
         )
     }
@@ -92,15 +101,6 @@ class ScheduleViewModel(
             teamTokens.contains(part)
         }
         return matchedGroup ?: ""
-    }
-
-    private fun parseGroupComponents(matchedGroup: String): String {
-        val match: MatchResult = GROUP_CODE_REGEX.find(matchedGroup.trim().uppercase())
-            ?: return matchedGroup
-        val gradeNumber: String = match.groupValues[GRADE_NUMBER_GROUP]
-        val genderLabel: String =
-            GENDER_LABELS[match.groupValues[GENDER_CODE_GROUP]] ?: return matchedGroup
-        return "$GRADE_LABEL $gradeNumber $genderLabel"
     }
 
     private fun generateLocationMap(locations: List<WebLocation>) {
@@ -164,17 +164,19 @@ class ScheduleViewModel(
         if (currentState.events.isEmpty()) {
             _uiState.value = currentState.copy(
                 calendarCsv = "",
-                errorMessage = EMPTY_EVENTS_ERROR
+                error = ScheduleError.EmptyEvents
             )
             return
         }
         val result: CalendarCsvResult = calendarConverter.convert(currentState.events)
-        val conversionError: String? = result.errors.takeIf { errors: List<String> ->
+        val conversionError: ScheduleError? = result.errors.takeIf { errors: List<String> ->
             errors.isNotEmpty()
-        }?.joinToString("\n")
+        }?.let { details: List<String> ->
+            ScheduleError.Conversion(details)
+        }
         _uiState.value = currentState.copy(
             calendarCsv = result.csv,
-            errorMessage = conversionError
+            error = conversionError
         )
     }
 
@@ -187,14 +189,14 @@ class ScheduleViewModel(
             downloadTextFile(createEventFileName(event), ICS_MIME_TYPE, icsContent)
             openUrl(googleLinkBuilder.createTemplateUrl(event))
         } catch (_: Exception) {
-            _uiState.value = _uiState.value.copy(errorMessage = CALENDAR_EXPORT_ERROR)
+            _uiState.value = _uiState.value.copy(error = ScheduleError.CalendarExportFailed)
         }
     }
 
     fun downloadCalendarFiles() {
         val currentState: ScheduleUiState = _uiState.value
         if (currentState.calendarCsv.isEmpty()) {
-            _uiState.value = currentState.copy(errorMessage = EMPTY_CSV_ERROR)
+            _uiState.value = currentState.copy(error = ScheduleError.EmptyCsv)
             return
         }
         try {
@@ -207,7 +209,7 @@ class ScheduleViewModel(
             )
             openUrl(GOOGLE_IMPORT_URL)
         } catch (_: Exception) {
-            _uiState.value = currentState.copy(errorMessage = CALENDAR_EXPORT_ERROR)
+            _uiState.value = currentState.copy(error = ScheduleError.CalendarExportFailed)
         }
     }
 
@@ -229,12 +231,6 @@ class ScheduleViewModel(
             "mailto:contact@mirthandmalice.co?subject=Soccer%20Scheduler"
         const val HTTP_PREFIX: String = "http://"
         const val HTTPS_PREFIX: String = "https://"
-        const val URL_PASTE_ERROR: String =
-            "Paste the page source, not a URL. Open the schedule, press Cmd+Option+U (Mac) or Ctrl+U (Windows/Linux), then copy all."
-        const val PARSE_ERROR: String =
-            "Could not parse that HTML. Copy the full page source and try again."
-        const val EMPTY_EVENTS_ERROR: String =
-            "Submit page source first so there are games to convert."
         const val SEASON_PATH_SEPARATOR: String = "/"
         const val TEAM_NAME_SEPARATOR: String = "-"
         const val BYE_MARKER: String = "(BYE)"
@@ -243,18 +239,6 @@ class ScheduleViewModel(
         const val ICS_MIME_TYPE: String = "text/calendar"
         const val GOOGLE_IMPORT_URL: String =
             "https://calendar.google.com/calendar/u/0/r/settings/export"
-        const val EMPTY_CSV_ERROR: String =
-            "Generate the calendar CSV first so there is a file to download."
-        const val CALENDAR_EXPORT_ERROR: String =
-            "Could not create calendar files. Generate the calendar and try again."
-        const val GRADE_LABEL: String = "Grade"
-        const val GRADE_NUMBER_GROUP: Int = 1
-        const val GENDER_CODE_GROUP: Int = 2
-        val GROUP_CODE_REGEX: Regex = Regex("^G(\\d+)([BG])$")
-        val GENDER_LABELS: Map<String, String> = mapOf(
-            "B" to "Boys",
-            "G" to "Girls"
-        )
         val CLUB_NAMES: Map<String, String> = mapOf(
             "AUSCR" to "Aloha United",
             "AJRSC" to "Albion Juniors",
@@ -266,7 +250,6 @@ class ScheduleViewModel(
             "WSC" to "Westside"
         )
     }
-
 
     fun contactEmail() {
         openUrl(CONTACT_MAILTO_URL)

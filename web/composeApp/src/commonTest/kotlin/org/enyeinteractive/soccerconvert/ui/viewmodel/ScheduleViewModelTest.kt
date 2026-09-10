@@ -16,7 +16,7 @@ class ScheduleViewModelTest {
         val viewModel: ScheduleViewModel = ScheduleViewModel()
         viewModel.onSubmit(inputHtml)
         val actualState: ScheduleUiState = viewModel.uiState.value
-        assertNull(actualState.errorMessage)
+        assertNull(actualState.error)
         assertEquals(8, actualState.events.size)
         assertEquals(6, actualState.locations.size)
         assertEquals("SWSC-G7B-Coupland", actualState.events.first().opponentKey)
@@ -33,7 +33,7 @@ class ScheduleViewModelTest {
         val viewModel: ScheduleViewModel = ScheduleViewModel()
         viewModel.onSubmit(inputRawText)
         val actualState: ScheduleUiState = viewModel.uiState.value
-        assertNull(actualState.errorMessage)
+        assertNull(actualState.error)
         assertEquals(8, actualState.events.size)
         assertEquals(expectedSampleMetadata(), actualState.scheduleMetadata)
     }
@@ -44,8 +44,7 @@ class ScheduleViewModelTest {
         val viewModel: ScheduleViewModel = ScheduleViewModel()
         viewModel.onSubmit(inputUrl)
         val actualState: ScheduleUiState = viewModel.uiState.value
-        val errorMessage: String? = actualState.errorMessage
-        assertTrue(errorMessage != null && errorMessage.contains("page source"))
+        assertEquals(ScheduleError.UrlPaste, actualState.error)
         assertEquals(0, actualState.events.size)
     }
 
@@ -59,7 +58,7 @@ class ScheduleViewModelTest {
         val actualLines: List<String> = actualState.calendarCsv.lines()
         assertEquals("Start Date, Start Time,  Description, Location, Subject,", actualLines.first())
         assertTrue(actualLines[1].startsWith("09/12/2026, 9:00, SWSC-G7B-Coupland"))
-        assertNull(actualState.errorMessage)
+        assertNull(actualState.error)
     }
 
     @Test
@@ -67,8 +66,7 @@ class ScheduleViewModelTest {
         val viewModel: ScheduleViewModel = ScheduleViewModel()
         viewModel.generateCalendar()
         val actualState: ScheduleUiState = viewModel.uiState.value
-        val errorMessage: String? = actualState.errorMessage
-        assertTrue(errorMessage != null && errorMessage.contains("Submit"))
+        assertEquals(ScheduleError.EmptyEvents, actualState.error)
         assertEquals("", actualState.calendarCsv)
     }
 
@@ -77,7 +75,7 @@ class ScheduleViewModelTest {
             team = "MUSC-G7B-Sacagawea",
             coach = "Sacagawea",
             club = "MUSC",
-            group = "Grade 7 Boys",
+            group = "G7B",
             season = "F2025"
         )
     }

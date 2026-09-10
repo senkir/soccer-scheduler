@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="welcome_title">Welcome to the Soccer calendar helper.</string>
+    <string name="instruction_open_cd">Open</string>
+    <string name="instruction_open_subtitle">Open the team schedule in another tab.</string>
+    <string name="instruction_select_all_cd">Select All</string>
+    <string name="instruction_select_all_subtitle">Select all, copy.</string>
+    <string name="instruction_paste_cd">Paste</string>
+    <string name="instruction_paste_subtitle">Paste into the field below.</string>
+    <string name="page_source_label">Page source</string>
+    <string name="page_source_placeholder">Paste page source, not a URL</string>
+    <string name="submit">Submit</string>
+    <string name="error_url_paste">Paste the page source, not a URL. Open the schedule, press Cmd+Option+U (Mac) or Ctrl+U (Windows/Linux), then copy all.</string>
+    <string name="error_parse">Could not parse that HTML. Copy the full page source and try again.</string>
+    <string name="error_empty_events">Submit page source first so there are games to convert.</string>
+    <string name="error_empty_csv">Generate the calendar CSV first so there is a file to download.</string>
+    <string name="error_calendar_export">Could not create calendar files. Generate the calendar and try again.</string>
+    <string name="download_calendar">Download Calendar.</string>
+    <string name="download_calendar_cd">Download Calendar</string>
+    <string name="game_schedule">Game Schedule</string>
+    <string name="label_coach">Coach:</string>
+    <string name="label_club">Club:</string>
+    <string name="label_season">Season:</string>
+    <string name="label_group">Group:</string>
+    <string name="label_games">Games:</string>
+    <string name="vs_opponent">VS. %1$s</string>
+    <string name="opponent_tbd">TBD</string>
+    <string name="add_to_calendar_cd">Add to Calendar.</string>
+    <string name="success_title">Success!</string>
+    <string name="next_step_individual">1. Click individual games to add them to your calendar of choice.</string>
+    <string name="next_step_bulk">2. Bulk add the whole schedule of games.</string>
+    <string name="next_step_import">Google — Import the CSV (or ICS). Apple — open the downloaded .ics.</string>
+    <string name="contact_prompt">For issues with scheduler please use this contact link.</string>
+    <string name="contact">Contact</string>
+    <string name="language_settings">Language</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_default">Default</string>
+
+    <string name="group_grade_gender">Grade %1$s %2$s</string>
+    <string name="gender_boys">Boys</string>
+    <string name="gender_girls">Girls</string>
+</resources>

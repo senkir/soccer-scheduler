@@ -21,36 +21,84 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import org.enyeinteractive.soccerconvert.black2
+import org.enyeinteractive.soccerconvert.locale.ENGLISH_LOCALE_TAG
+import org.enyeinteractive.soccerconvert.locale.SPANISH_LOCALE_TAG
 import org.enyeinteractive.soccerconvert.medGreen2
 import org.enyeinteractive.soccerconvert.offwhite1
 import org.enyeinteractive.soccerconvert.ui.data.Location
 import org.enyeinteractive.soccerconvert.ui.data.ScheduleMetadata
 import org.enyeinteractive.soccerconvert.ui.data.ScheduledEvent
+import org.enyeinteractive.soccerconvert.ui.viewmodel.ScheduleError
 import org.enyeinteractive.soccerconvert.ui.viewmodel.ScheduleUiState
 import org.enyeinteractive.soccerconvert.ui.viewmodel.ScheduleViewModel
 import org.enyeinteractive.soccerconvert.white1
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import soccerconvertscript.composeapp.generated.resources.Res
+import soccerconvertscript.composeapp.generated.resources.add_to_calendar_cd
+import soccerconvertscript.composeapp.generated.resources.contact
+import soccerconvertscript.composeapp.generated.resources.contact_prompt
+import soccerconvertscript.composeapp.generated.resources.download_calendar
+import soccerconvertscript.composeapp.generated.resources.download_calendar_cd
+import soccerconvertscript.composeapp.generated.resources.error_calendar_export
+import soccerconvertscript.composeapp.generated.resources.error_empty_csv
+import soccerconvertscript.composeapp.generated.resources.error_empty_events
+import soccerconvertscript.composeapp.generated.resources.error_parse
+import soccerconvertscript.composeapp.generated.resources.error_url_paste
+import soccerconvertscript.composeapp.generated.resources.game_schedule
+import soccerconvertscript.composeapp.generated.resources.gender_boys
+import soccerconvertscript.composeapp.generated.resources.gender_girls
 import soccerconvertscript.composeapp.generated.resources.ic_calendar_add
 import soccerconvertscript.composeapp.generated.resources.ic_calendar_add_2
 import soccerconvertscript.composeapp.generated.resources.ic_open_window
 import soccerconvertscript.composeapp.generated.resources.ic_paste
 import soccerconvertscript.composeapp.generated.resources.ic_select_all
+import soccerconvertscript.composeapp.generated.resources.instruction_open_cd
+import soccerconvertscript.composeapp.generated.resources.instruction_open_subtitle
+import soccerconvertscript.composeapp.generated.resources.instruction_paste_cd
+import soccerconvertscript.composeapp.generated.resources.instruction_paste_subtitle
+import soccerconvertscript.composeapp.generated.resources.instruction_select_all_cd
+import soccerconvertscript.composeapp.generated.resources.instruction_select_all_subtitle
+import soccerconvertscript.composeapp.generated.resources.label_club
+import soccerconvertscript.composeapp.generated.resources.label_coach
+import soccerconvertscript.composeapp.generated.resources.label_games
+import soccerconvertscript.composeapp.generated.resources.label_group
+import soccerconvertscript.composeapp.generated.resources.label_season
+import soccerconvertscript.composeapp.generated.resources.language_default
+import soccerconvertscript.composeapp.generated.resources.language_english
+import soccerconvertscript.composeapp.generated.resources.language_settings
+import soccerconvertscript.composeapp.generated.resources.language_spanish
+import soccerconvertscript.composeapp.generated.resources.next_step_bulk
+import soccerconvertscript.composeapp.generated.resources.next_step_import
+import soccerconvertscript.composeapp.generated.resources.next_step_individual
+import soccerconvertscript.composeapp.generated.resources.opponent_tbd
+import soccerconvertscript.composeapp.generated.resources.page_source_label
+import soccerconvertscript.composeapp.generated.resources.page_source_placeholder
+import soccerconvertscript.composeapp.generated.resources.submit
+import soccerconvertscript.composeapp.generated.resources.success_title
+import soccerconvertscript.composeapp.generated.resources.vs_opponent
+import soccerconvertscript.composeapp.generated.resources.welcome_title
 
 @Composable
 fun ScheduleScreen(
@@ -83,8 +131,8 @@ fun ScheduleScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 160.dp),
-                    label = { Text(text = "Page source") },
-                    placeholder = { Text(text = "Paste page source, not a URL") },
+                    label = { Text(text = stringResource(Res.string.page_source_label)) },
+                    placeholder = { Text(text = stringResource(Res.string.page_source_placeholder)) },
                     lineLimits = TextFieldLineLimits.MultiLine(
                         minHeightInLines = 8,
                         maxHeightInLines = 16
@@ -94,14 +142,14 @@ fun ScheduleScreen(
                     onClick = { viewModel.onSubmit(textState.text.toString()) },
                     modifier = Modifier.padding(10.dp)
                 ) {
-                    Text(text = "Submit")
+                    Text(text = stringResource(Res.string.submit))
                 }
             }
         }
-        val errorMessage: String? = uiState.errorMessage
-        if (errorMessage != null) {
+        val error: ScheduleError? = uiState.error
+        if (error != null) {
             Text(
-                text = errorMessage,
+                text = resolveErrorMessage(error),
                 color = MaterialTheme.colorScheme.error
             )
         }
@@ -136,16 +184,16 @@ fun ScheduleScreen(
                             Icon(
                                 painterResource(Res.drawable.ic_calendar_add_2),
                                 modifier = Modifier.size(38.dp),
-                                contentDescription = "Download Calendar"
+                                contentDescription = stringResource(Res.string.download_calendar_cd)
                             )
-                            Text("Download Calendar.")
+                            Text(stringResource(Res.string.download_calendar))
                         }
                     }
                 }
             }
 
             Text(
-                "Game Schedule",
+                stringResource(Res.string.game_schedule),
                 style = MaterialTheme.typography.titleLarge
             )
             LazyVerticalGrid(
@@ -172,21 +220,83 @@ fun ScheduleScreen(
 
 @Composable
 fun EmailFooter(
+    selectedLocaleTag: String?,
+    onSelectLocale: (String) -> Unit,
     onClickEmail: () -> Unit
 ) {
-    Column(
-        Modifier.padding(top = 100.dp, start = 10.dp, end = 10.dp, bottom = 10.dp)
-            .fillMaxWidth()
+    Row(
+        modifier = Modifier
+            .padding(top = 100.dp, start = 10.dp, end = 10.dp, bottom = 10.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Bottom
     ) {
-        Text(
-            "For issues with scheduler please use this contact link.",
-            modifier = Modifier.align(Alignment.End)
+        LanguageSettingsButton(
+            selectedLocaleTag = selectedLocaleTag,
+            onSelectLocale = onSelectLocale
         )
-        Button(
-            onClick = onClickEmail,
-            modifier = Modifier.align(Alignment.End)
+        Column(
+            horizontalAlignment = Alignment.End
         ) {
-            Text("Contact")
+            Text(
+                stringResource(Res.string.contact_prompt)
+            )
+            Button(
+                onClick = onClickEmail
+            ) {
+                Text(stringResource(Res.string.contact))
+            }
+        }
+    }
+}
+
+@Composable
+private fun LanguageSettingsButton(
+    selectedLocaleTag: String?,
+    onSelectLocale: (String) -> Unit
+) {
+    var isExpanded: Boolean by remember { mutableStateOf(false) }
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Text(
+            stringResource(Res.string.language_settings),
+            modifier = Modifier.padding(4.dp)
+        )
+        OutlinedButton(
+            onClick = { isExpanded = !isExpanded }
+        ) {
+            Text(selectedLocaleTag ?: stringResource(Res.string.language_default))
+        }
+
+        DropdownMenu(
+            isExpanded,
+            onDismissRequest = {
+                isExpanded = false
+            }
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(4.dp)
+            ) {
+                TextButton(
+                    onClick = {
+                        onSelectLocale(ENGLISH_LOCALE_TAG)
+                        isExpanded = false
+                    }
+                ) {
+                    Text(stringResource(Res.string.language_english))
+                }
+                TextButton(
+                    onClick = {
+                        onSelectLocale(SPANISH_LOCALE_TAG)
+                        isExpanded = false
+                    }
+                ) {
+                    Text(stringResource(Res.string.language_spanish))
+                }
+            }
         }
     }
 }
@@ -200,28 +310,26 @@ fun HeaderContent(
         Modifier.padding(4.dp)
     ) {
         Row {
-            Text("Coach:")
+            Text(stringResource(Res.string.label_coach))
             Text(scheduleMetadata.coach)
         }
-
         Row {
-            Text("Club:")
+            Text(stringResource(Res.string.label_club))
             Text(scheduleMetadata.club)
         }
-
         Row {
-            Text("Season:")
+            Text(stringResource(Res.string.label_season))
             Text(
                 scheduleMetadata.season,
                 style = MaterialTheme.typography.bodyLargeEmphasized
             )
         }
         Row {
-            Text("Group:")
-            Text(scheduleMetadata.group)
+            Text(stringResource(Res.string.label_group))
+            Text(formatGroupLabel(scheduleMetadata.group))
         }
         Row {
-            Text("Games:")
+            Text(stringResource(Res.string.label_games))
             Text(count.toString())
         }
     }
@@ -242,8 +350,10 @@ fun ScheduledEventCard(
             EventHeader(event, onAddToCalendar)
 
             if (event.opponentKey != BYE_MARKER) {
+                val opponentName: String = event.opponent?.name
+                    ?: stringResource(Res.string.opponent_tbd)
                 Text(
-                    text = "VS. ${event.opponent?.name ?: "TBD"}",
+                    text = stringResource(Res.string.vs_opponent, opponentName),
                     style = MaterialTheme.typography.bodyMediumEmphasized
                 )
             }
@@ -272,7 +382,7 @@ fun EventHeader(
         ) {
             Icon(
                 painterResource(Res.drawable.ic_calendar_add),
-                contentDescription = "Add to Calendar.",
+                contentDescription = stringResource(Res.string.add_to_calendar_cd),
                 modifier = Modifier.size(28.dp)
             )
         }
@@ -293,6 +403,38 @@ fun EventHeader(
 }
 
 private const val BYE_MARKER: String = "(BYE)"
+private const val GENDER_BOYS_CODE: String = "B"
+private const val GENDER_GIRLS_CODE: String = "G"
+private const val GRADE_NUMBER_GROUP: Int = 1
+private const val GENDER_CODE_GROUP: Int = 2
+private val GROUP_CODE_REGEX: Regex = Regex("^G(\\d+)([BG])$")
+
+@Composable
+private fun resolveErrorMessage(error: ScheduleError): String {
+    return when (error) {
+        ScheduleError.UrlPaste -> stringResource(Res.string.error_url_paste)
+        ScheduleError.ParseFailed -> stringResource(Res.string.error_parse)
+        ScheduleError.EmptyEvents -> stringResource(Res.string.error_empty_events)
+        ScheduleError.EmptyCsv -> stringResource(Res.string.error_empty_csv)
+        ScheduleError.CalendarExportFailed -> stringResource(Res.string.error_calendar_export)
+        is ScheduleError.Conversion -> error.details.joinToString("\n")
+    }
+}
+
+@Composable
+private fun formatGroupLabel(groupCode: String): String {
+    val match: MatchResult = GROUP_CODE_REGEX.find(groupCode.trim().uppercase())
+        ?: return groupCode
+    val gradeNumber: String = match.groupValues[GRADE_NUMBER_GROUP]
+    val genderCode: String = match.groupValues[GENDER_CODE_GROUP]
+    val genderLabel: String = when (genderCode) {
+        GENDER_BOYS_CODE -> stringResource(Res.string.gender_boys)
+        GENDER_GIRLS_CODE -> stringResource(Res.string.gender_girls)
+        else -> return groupCode
+    }
+    return "TBD"
+//    return stringResource(Res.string.group_grade_gender, gradeNumber, genderLabel)
+}
 
 @Composable
 fun NextStepsGraphic() {
@@ -301,17 +443,17 @@ fun NextStepsGraphic() {
         Modifier.background(color = offwhite1).padding(4.dp)
     ) {
         Text(
-            text = "Success!",
+            text = stringResource(Res.string.success_title),
             style = typography.displaySmallEmphasized
         )
         Text(
-            text = "1. Click individual games to add them to your calendar of choice."
+            text = stringResource(Res.string.next_step_individual)
         )
         Text(
-            text = "2. Bulk add the whole schedule of games. "
+            text = stringResource(Res.string.next_step_bulk)
         )
         Text(
-            text = "Google — Import the CSV (or ICS). Apple — open the downloaded .ics."
+            text = stringResource(Res.string.next_step_import)
         )
     }
 }
@@ -321,7 +463,7 @@ fun NextStepsGraphic() {
 fun SetupProcessGraphic() {
 
     Text(
-        text = "Welcome to the Soccer calendar helper.",
+        text = stringResource(Res.string.welcome_title),
         modifier = Modifier.padding(4.dp),
         style = typography.displaySmallEmphasized
     )
@@ -335,18 +477,18 @@ fun SetupProcessGraphic() {
 
         InstructionalIcon(
             openIcon,
-            contentDescription = "Open",
-            subtitle = "Open the team schedule in another tab."
+            contentDescription = stringResource(Res.string.instruction_open_cd),
+            subtitle = stringResource(Res.string.instruction_open_subtitle)
         )
         InstructionalIcon(
             allIcon,
-            contentDescription = "Select All",
-            subtitle = "Select all, copy."
+            contentDescription = stringResource(Res.string.instruction_select_all_cd),
+            subtitle = stringResource(Res.string.instruction_select_all_subtitle)
         )
         InstructionalIcon(
             pasteIcon,
-            contentDescription = "Paste",
-            subtitle = "Paste into the field below."
+            contentDescription = stringResource(Res.string.instruction_paste_cd),
+            subtitle = stringResource(Res.string.instruction_paste_subtitle)
         )
 
     }

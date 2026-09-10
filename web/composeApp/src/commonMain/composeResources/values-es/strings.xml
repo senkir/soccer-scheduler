@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="welcome_title">Bienvenido al asistente de calendario de fútbol.</string>
+    <string name="instruction_open_cd">Abrir</string>
+    <string name="instruction_open_subtitle">Abre el calendario del equipo en otra pestaña.</string>
+    <string name="instruction_select_all_cd">Seleccionar todo</string>
+    <string name="instruction_select_all_subtitle">Selecciona todo y copia.</string>
+    <string name="instruction_paste_cd">Pegar</string>
+    <string name="instruction_paste_subtitle">Pega en el campo de abajo.</string>
+    <string name="page_source_label">Código de la página</string>
+    <string name="page_source_placeholder">Pega el código de la página, no una URL</string>
+    <string name="submit">Enviar</string>
+    <string name="error_url_paste">Pega el código de la página, no una URL. Abre el calendario, pulsa Cmd+Option+U (Mac) o Ctrl+U (Windows/Linux) y copia todo.</string>
+    <string name="error_parse">No se pudo analizar ese HTML. Copia el código completo de la página e inténtalo de nuevo.</string>
+    <string name="error_empty_events">Envía primero el código de la página para convertir los partidos.</string>
+    <string name="error_empty_csv">Genera primero el CSV del calendario para descargar el archivo.</string>
+    <string name="error_calendar_export">No se pudieron crear los archivos del calendario. Genera el calendario e inténtalo de nuevo.</string>
+    <string name="download_calendar">Descargar calendario.</string>
+    <string name="download_calendar_cd">Descargar calendario</string>
+    <string name="game_schedule">Calendario de partidos</string>
+    <string name="label_coach">Entrenador:</string>
+    <string name="label_club">Club:</string>
+    <string name="label_season">Temporada:</string>
+    <string name="label_group">Grupo:</string>
+    <string name="label_games">Partidos:</string>
+    <string name="vs_opponent">VS. %1$s</string>
+    <string name="opponent_tbd">Por definir</string>
+    <string name="add_to_calendar_cd">Añadir al calendario.</string>
+    <string name="success_title">¡Listo!</string>
+    <string name="next_step_individual">1. Haz clic en cada partido para añadirlo al calendario que elijas.</string>
+    <string name="next_step_bulk">2. Añade de una vez todo el calendario de partidos.</string>
+    <string name="next_step_import">Google: importa el CSV (o ICS). Apple: abre el archivo .ics descargado.</string>
+    <string name="contact_prompt">Si tienes problemas con el calendario, usa este enlace de contacto.</string>
+    <string name="contact">Contacto</string>
+    <string name="language_settings">Idioma</string>
+    <string name="language_default">Por Defecto</string>
+    <string name="group_grade_gender">Grado %1$s %2$s</string>
+    <string name="gender_boys">Niños</string>
+    <string name="gender_girls">Niñas</string>
+</resources>
