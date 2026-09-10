@@ -21,18 +21,18 @@ kotlin {
         binaries.executable()
     }
     @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        outputModuleName = "composeApp"
-        browser {
-            commonWebpackConfig {
-                outputFileName = "composeApp.js"
-                cssSupport {
-                    enabled.set(true)
-                }
-            }
-        }
-        binaries.executable()
-    }
+//    wasmJs {
+//        outputModuleName = "composeApp"
+//        browser {
+//            commonWebpackConfig {
+//                outputFileName = "composeApp.js"
+//                cssSupport {
+//                    enabled.set(true)
+//                }
+//            }
+//        }
+//        binaries.executable()
+//    }
     sourceSets {
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -49,4 +49,9 @@ kotlin {
             implementation(libs.kotlin.test)
         }
     }
+}
+
+compose.resources {
+    publicResClass = false
+    generateResClass = auto
 }

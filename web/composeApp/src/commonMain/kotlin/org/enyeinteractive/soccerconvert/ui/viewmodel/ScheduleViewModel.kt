@@ -9,12 +9,12 @@ import org.enyeinteractive.soccerconvert.calendar.CalendarCsvResult
 import org.enyeinteractive.soccerconvert.calendar.GoogleCalendarLinkBuilder
 import org.enyeinteractive.soccerconvert.calendar.IcsCalendarConverter
 import org.enyeinteractive.soccerconvert.network.HtmlSourceScanner
-import org.enyeinteractive.soccerconvert.platform.downloadTextFile
-import org.enyeinteractive.soccerconvert.platform.openUrl
 import org.enyeinteractive.soccerconvert.network.model.WebContent
 import org.enyeinteractive.soccerconvert.network.model.WebLocation
 import org.enyeinteractive.soccerconvert.network.model.WebOpponent
 import org.enyeinteractive.soccerconvert.network.model.WebSchedule
+import org.enyeinteractive.soccerconvert.platform.downloadTextFile
+import org.enyeinteractive.soccerconvert.platform.openUrl
 import org.enyeinteractive.soccerconvert.ui.data.Location
 import org.enyeinteractive.soccerconvert.ui.data.Opponent
 import org.enyeinteractive.soccerconvert.ui.data.ScheduleMetadata
@@ -129,7 +129,10 @@ class ScheduleViewModel(
         return CLUB_NAMES[clubCode] ?: clubCode
     }
 
-    private fun createScheduledEvents(games: List<WebSchedule>, groupCode: String): List<ScheduledEvent> {
+    private fun createScheduledEvents(
+        games: List<WebSchedule>,
+        groupCode: String
+    ): List<ScheduledEvent> {
         return games.mapIndexed { index: Int, game: WebSchedule ->
             ScheduledEvent(
                 index = index,
@@ -197,7 +200,11 @@ class ScheduleViewModel(
         try {
             val baseName: String = createSeasonFileName(currentState.scheduleMetadata)
             downloadTextFile("$baseName.csv", CSV_MIME_TYPE, currentState.calendarCsv)
-            downloadTextFile("$baseName.ics", ICS_MIME_TYPE, icsConverter.convert(currentState.events))
+            downloadTextFile(
+                "$baseName.ics",
+                ICS_MIME_TYPE,
+                icsConverter.convert(currentState.events)
+            )
             openUrl(GOOGLE_IMPORT_URL)
         } catch (_: Exception) {
             _uiState.value = currentState.copy(errorMessage = CALENDAR_EXPORT_ERROR)
@@ -218,6 +225,8 @@ class ScheduleViewModel(
     }
 
     private companion object {
+        const val CONTACT_MAILTO_URL: String =
+            "mailto:contact@mirthandmalice.co?subject=Soccer%20Scheduler"
         const val HTTP_PREFIX: String = "http://"
         const val HTTPS_PREFIX: String = "https://"
         const val URL_PASTE_ERROR: String =
@@ -256,5 +265,10 @@ class ScheduleViewModel(
             "TSC" to "Tualitin",
             "WSC" to "Westside"
         )
+    }
+
+
+    fun contactEmail() {
+        openUrl(CONTACT_MAILTO_URL)
     }
 }
