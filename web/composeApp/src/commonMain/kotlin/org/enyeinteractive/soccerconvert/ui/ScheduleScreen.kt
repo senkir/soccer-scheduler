@@ -69,6 +69,7 @@ import soccerconvertscript.composeapp.generated.resources.error_url_paste
 import soccerconvertscript.composeapp.generated.resources.game_schedule
 import soccerconvertscript.composeapp.generated.resources.gender_boys
 import soccerconvertscript.composeapp.generated.resources.gender_girls
+import soccerconvertscript.composeapp.generated.resources.group_grade_gender
 import soccerconvertscript.composeapp.generated.resources.ic_calendar_add
 import soccerconvertscript.composeapp.generated.resources.ic_calendar_add_2
 import soccerconvertscript.composeapp.generated.resources.ic_open_window
@@ -213,9 +214,6 @@ fun ScheduleScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
-//    EmailFooter({
-//        viewModel.contactEmail()
-//    })
 }
 
 @Composable
@@ -432,8 +430,7 @@ private fun formatGroupLabel(groupCode: String): String {
         GENDER_GIRLS_CODE -> stringResource(Res.string.gender_girls)
         else -> return groupCode
     }
-    return "TBD"
-//    return stringResource(Res.string.group_grade_gender, gradeNumber, genderLabel)
+    return stringResource(Res.string.group_grade_gender, gradeNumber, genderLabel)
 }
 
 @Composable

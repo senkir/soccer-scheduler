@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
-    <string name="welcome_title">Welcome to the Soccer calendar helper.</string>
+    <string name="welcome_title">Welcome to the PDX Soccer Calendar Helper.</string>
     <string name="instruction_open_cd">Open</string>
     <string name="instruction_open_subtitle">Open the team schedule in another tab.</string>
     <string name="instruction_select_all_cd">Select All</string>
