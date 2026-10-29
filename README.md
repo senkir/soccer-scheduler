@@ -8,6 +8,9 @@ https://soccer.mirthandmalice.co/
 
 # Usage
 
+<img width="1497" height="462" alt="soccer-helper-empty" src="https://github.com/user-attachments/assets/4ee5e7c1-097e-46a9-9834-bc6ee201c82d" />
+
+
 - Go to the `soccer schedule` page from `mirthandmalice` (https://soccer.mirthandmalice.co/)
 - Open `compumetrics` (https://schedules.compumetics.com/)
 - Click through any information/disclaimers regarding soccer conduct
